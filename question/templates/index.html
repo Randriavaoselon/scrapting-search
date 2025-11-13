@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche Intelligente</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header et Logo */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .logo i {
+            font-size: 50px;
+            color: #667eea;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1rem;
+        }
+
+        /* Section Email */
+        .email-section {
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+
+        .email-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .email-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .email-label {
+            color: white;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .btn-show-history {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-show-history:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Section d'information */
+        .info-section {
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+
+        .info-message {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .info-message i {
+            font-size: 1.2rem;
+            color: #ffd700;
+        }
+
+        /* Champ de recherche */
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto 60px;
+            position: relative;
+        }
+
+        .search-box {
+            position: relative;
+            background: white;
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 60px 20px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            display: none;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            margin-top: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
+        .result-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .result-item:hover {
+            background: #f8f9fa;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .result-source {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        /* Section Historique */
+        .history-section {
+            display: none;
+            margin-top: 40px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .history-question {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Carousel */
+        .carousel-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .carousel {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-item {
+            min-width: 300px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .carousel-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .carousel-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .carousel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .carousel-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        /* Résultats de recherche */
+        .results-section {
+            display: none;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .badge-google {
+            background: #4285F4;
+            color: white;
+        }
+
+        .badge-stackoverflow {
+            background: #F48024;
+            color: white;
+        }
+
+        .result-url {
+            color: #666;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .result-body h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .result-body p {
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .result-tags {
+            margin-top: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-input {
+                padding: 15px 50px 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .carousel-item {
+                min-width: 250px;
+                padding: 20px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .email-input-container {
+                flex-direction: column;
+            }
+
+            .btn-show-history {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header avec Logo -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-search"></i>
+            </div>
+            <h1>Recherche Intelligente</h1>
+            <p>Trouvez des réponses sur Google et StackOverflow instantanément</p>
+        </div>
+
+        <!-- Section Email -->
+        <div class="email-section">
+            <label class="email-label" for="userEmail">
+                <i class="fas fa-envelope"></i> Votre email (pour sauvegarder l'historique)
+            </label>
+            <div class="email-input-container">
+                <input 
+                    type="email" 
+                    class="email-input" 
+                    placeholder="votre@email.com" 
+                    id="userEmail"
+                >
+                <button class="btn-show-history" onclick="app.showHistory()">
+                    <i class="fas fa-history"></i> Historique
+                </button>
+            </div>
+        </div>
+
+        <!-- Section d'information -->
+        <div class="info-section" id="infoSection" style="display: none;">
+            <div class="info-message">
+                <i class="fas fa-info-circle"></i>
+                <span id="infoText"></span>
+            </div>
+        </div>
+
+        <!-- Champ de recherche automatique -->
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Posez votre question technique..." 
+                    id="searchInput"
+                >
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="loading-spinner" id="loadingSpinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <!-- Section Historique -->
+        <div class="history-section" id="historySection">
+            <h2 class="section-title">Votre Historique de Recherches</h2>
+            <div id="historyList"></div>
+        </div>
+
+        <!-- Carousel d'informations -->
+        <div class="carousel-section">
+            <h2 class="section-title">Comment ça marche ?</h2>
+            <div class="carousel">
+                <div class="carousel-item">
+                    <div class="carousel-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <h3 class="carousel-title">Tapez votre question</h3>
+                    <p class="carousel-description">
+                        Posez n'importe quelle question technique ou problème de programmation
+                    </p>
+                </div>
+                <div class="carousel-item">
+                    <div class="carousel-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="carousel-title">Recherche automatique</h3>
+                    <p class="carousel-description">
+                        Recherche simultanée sur Google et StackOverflow sans bouton
+                    </p>
+                </div>
+                <div class="carousel-item">
+                    <div class="carousel-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="carousel-title">Résultats instantanés</h3>
+                    <p class="carousel-description">
+                        Obtenez des réponses pertinentes en temps réel
+                    </p>
+                </div>
+                <div class="carousel-item">
+                    <div class="carousel-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 class="carousel-title">Historique sauvegardé</h3>
+                    <p class="carousel-description">
+                        Toutes vos recherches sont sauvegardées avec votre email
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section des résultats -->
+        <div class="results-section" id="resultsSection">
+            <h2 class="section-title">Résultats de votre recherche</h2>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        class SearchApp {
+            constructor() {
+                this.searchInput = document.getElementById('searchInput');
+                this.searchResults = document.getElementById('searchResults');
+                this.loadingSpinner = document.getElementById('loadingSpinner');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.resultsGrid = document.getElementById('resultsGrid');
+                this.infoSection = document.getElementById('infoSection');
+                this.infoText = document.getElementById('infoText');
+                this.userEmail = document.getElementById('userEmail');
+                this.historySection = document.getElementById('historySection');
+                this.historyList = document.getElementById('historyList');
+                
+                this.debounceTimer = null;
+                this.currentSearch = '';
+                
+                this.initEventListeners();
+                this.loadSavedEmail();
+            }
+            
+            initEventListeners() {
+                // Recherche automatique avec debounce
+                this.searchInput.addEventListener('input', (e) => {
+                    this.handleSearchInput(e.target.value);
+                });
+                
+                // Sauvegarder l'email quand il change
+                this.userEmail.addEventListener('change', () => {
+                    this.saveEmail();
+                });
+                
+                // Fermer les résultats en cliquant ailleurs
+                document.addEventListener('click', (e) => {
+                    if (!this.searchResults.contains(e.target) && e.target !== this.searchInput) {
+                        this.hideResults();
+                    }
+                });
+            }
+            
+            saveEmail() {
+                const email = this.userEmail.value;
+                if (email) {
+                    localStorage.setItem('userEmail', email);
+                }
+            }
+            
+            loadSavedEmail() {
+                const savedEmail = localStorage.getItem('userEmail');
+                if (savedEmail) {
+                    this.userEmail.value = savedEmail;
+                }
+            }
+            
+            handleSearchInput(query) {
+                clearTimeout(this.debounceTimer);
+                
+                if (query.length < 3) {
+                    this.hideResults();
+                    this.hideLoading();
+                    this.hideInfo();
+                    return;
+                }
+                
+                this.currentSearch = query;
+                this.showLoading();
+                
+                this.debounceTimer = setTimeout(() => {
+                    this.performSearch(query);
+                }, 500);
+            }
+            
+            async performSearch(query) {
+                try {
+                    const email = this.userEmail.value || 'anonymous@example.com';
+                    
+                    // Utiliser l'endpoint qui sauvegarde automatiquement
+                    const response = await fetch(`/api/recherches/rechercher_solutions/?q=${encodeURIComponent(query)}&email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+                    
+                    this.hideLoading();
+                    this.displaySearchResults(data);
+                    
+                } catch (error) {
+                    console.error('Erreur de recherche:', error);
+                    this.hideLoading();
+                    this.showError('Erreur lors de la recherche');
+                }
+            }
+            
+            async showHistory() {
+                const email = this.userEmail.value;
+                if (!email) {
+                    alert('Veuillez entrer votre email pour voir l\'historique');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/api/recherches/historique_utilisateur/?email=${encodeURIComponent(email)}`);
+                    const data = await response.json();
+                    
+                    this.displayHistory(data);
+                    
+                } catch (error) {
+                    console.error('Erreur chargement historique:', error);
+                    alert('Erreur lors du chargement de l\'historique');
+                }
+            }
+            
+            displayHistory(data) {
+                this.historyList.innerHTML = '';
+                
+                if (data.historique.length === 0) {
+                    this.historyList.innerHTML = '<div class="history-item">Aucune recherche sauvegardée</div>';
+                } else {
+                    data.historique.forEach(recherche => {
+                        const historyItem = document.createElement('div');
+                        historyItem.className = 'history-item';
+                        historyItem.innerHTML = `
+                            <div class="history-question">${recherche.question_recherche}</div>
+                            <div class="history-date">${new Date(recherche.date_creation).toLocaleString('fr-FR')}</div>
+                        `;
+                        
+                        historyItem.addEventListener('click', () => {
+                            this.searchInput.value = recherche.question_recherche;
+                            this.handleSearchInput(recherche.question_recherche);
+                            this.hideHistory();
+                        });
+                        
+                        this.historyList.appendChild(historyItem);
+                    });
+                }
+                
+                this.historySection.style.display = 'block';
+                this.historySection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            hideHistory() {
+                this.historySection.style.display = 'none';
+            }
+            
+            displaySearchResults(data) {
+                if (!data.sources) {
+                    this.showError('Aucun résultat trouvé');
+                    return;
+                }
+                
+                const allResults = [
+                    ...(data.sources.google?.resultats || []),
+                    ...(data.sources.stackoverflow?.resultats || [])
+                ];
+                
+                if (allResults.length === 0) {
+                    this.showError('Aucun résultat trouvé');
+                    return;
+                }
+                
+                // Afficher les résultats dans le dropdown
+                this.searchResults.innerHTML = allResults.slice(0, 5).map(result => `
+                    <div class="result-item" onclick="app.selectResult('${result.titre.replace(/'/g, "\\'")}')">
+                        <div class="result-title">${this.truncateText(result.titre, 60)}</div>
+                        <div class="result-source">${result.source}</div>
+                    </div>
+                `).join('');
+                
+                this.showResults();
+                
+                // Afficher les résultats complets
+                this.displayFullResults(data);
+            }
+            
+            displayFullResults(data) {
+                this.resultsGrid.innerHTML = '';
+                
+                // Afficher les messages d'information
+                this.displayInfoMessages(data);
+                
+                // Afficher résultats Google
+                if (data.sources.google?.resultats?.length > 0) {
+                    data.sources.google.resultats.forEach(result => {
+                        this.addResultCard(result, 'google');
+                    });
+                }
+                
+                // Afficher résultats StackOverflow
+                if (data.sources.stackoverflow?.resultats?.length > 0) {
+                    data.sources.stackoverflow.resultats.forEach(result => {
+                        this.addResultCard(result, 'stackoverflow');
+                    });
+                }
+                
+                this.resultsSection.style.display = 'block';
+                this.scrollToResults();
+            }
+            
+            displayInfoMessages(data) {
+                let messages = [];
+                
+                if (data.sources.google?.note) {
+                    messages.push(data.sources.google.note);
+                }
+                
+                if (data.sources.stackoverflow?.note) {
+                    messages.push(data.sources.stackoverflow.note);
+                }
+                
+                if (messages.length > 0) {
+                    this.infoText.textContent = messages.join(' | ');
+                    this.infoSection.style.display = 'block';
+                } else {
+                    this.infoSection.style.display = 'none';
+                }
+            }
+            
+            addResultCard(result, source) {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                // Construire les tags si disponibles
+                const tagsHtml = result.tags ? `
+                    <div class="result-tags">
+                        ${result.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                ` : '';
+                
+                card.innerHTML = `
+                    <div class="result-header">
+                        <span class="result-badge ${source === 'google' ? 'badge-google' : 'badge-stackoverflow'}">
+                            ${source === 'google' ? 'Google' : 'StackOverflow'}
+                        </span>
+                        <span class="result-url">${this.truncateUrl(result.url)}</span>
+                    </div>
+                    <div class="result-body">
+                        <h3>${result.titre}</h3>
+                        <p>${result.description || 'Aucune description disponible'}</p>
+                        ${tagsHtml}
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    window.open(result.url, '_blank');
+                });
+                
+                this.resultsGrid.appendChild(card);
+            }
+            
+            selectResult(title) {
+                this.searchInput.value = title;
+                this.hideResults();
+                this.handleSearchInput(title);
+            }
+            
+            showLoading() {
+                this.loadingSpinner.style.display = 'block';
+                document.querySelector('.search-icon').style.display = 'none';
+            }
+            
+            hideLoading() {
+                this.loadingSpinner.style.display = 'none';
+                document.querySelector('.search-icon').style.display = 'block';
+            }
+            
+            showResults() {
+                this.searchResults.style.display = 'block';
+            }
+            
+            hideResults() {
+                this.searchResults.style.display = 'none';
+            }
+            
+            hideInfo() {
+                this.infoSection.style.display = 'none';
+            }
+            
+            showError(message) {
+                this.searchResults.innerHTML = `<div class="result-item">${message}</div>`;
+                this.showResults();
+            }
+            
+            scrollToResults() {
+                this.resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            truncateText(text, length) {
+                return text.length > length ? text.substring(0, length) + '...' : text;
+            }
+            
+            truncateUrl(url) {
+                try {
+                    const urlObj = new URL(url);
+                    return urlObj.hostname + (urlObj.pathname !== '/' ? urlObj.pathname : '');
+                } catch {
+                    return this.truncateText(url, 50);
+                }
+            }
+        }
+        
+        // Initialiser l'application
+        const app = new SearchApp();
+        
+        // Animation du carousel
+        let scrollPosition = 0;
+        const carousel = document.querySelector('.carousel');
+        
+        function autoScrollCarousel() {
+            if (carousel) {
+                scrollPosition += 1;
+                if (scrollPosition >= carousel.scrollWidth - carousel.clientWidth) {
+                    scrollPosition = 0;
+                }
+                carousel.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+            }
+        }
+        
+        setInterval(autoScrollCarousel, 50);
+    </script>
+</body>
+</html>
