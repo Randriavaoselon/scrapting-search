@@ -29,9 +29,12 @@ SECRET_KEY = 'django-insecure-4rw2#3#x!df)k2#*knexfw%u1_k4l-9+4$%4w8hpl&mba1s==!
 
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'scrapting-search.onrender.com',
+    '127.0.0.1',
+]
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(' ') if not DEBUG else []
+#ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(' ') if not DEBUG else []
 
 # Application definition
 
