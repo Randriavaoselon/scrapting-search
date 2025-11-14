@@ -95,12 +95,11 @@ WSGI_APPLICATION = 'search.wsgi.application'
 # Database configuration
 DATABASES = {
     'default': dj_database_url.parse(
-        "postgresql://scraping_db_twae_user:V3ICRAFX5OnrQxMdJ3h6h1fZAUrXVlQd@dpg-d4b32cur433s738loleg-a.oregon-postgres.render.com/scraping_db_twae",
+        os.environ.get("DATABASE_URL", ""),
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=False
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
