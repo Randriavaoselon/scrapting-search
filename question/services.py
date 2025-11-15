@@ -1,9 +1,8 @@
 import requests
 import time
-import json
-import os
-from django.conf import settings
 import random
+from django.conf import settings
+
 
 class GoogleSearchService:
     @staticmethod
@@ -86,6 +85,7 @@ class GoogleSearchService:
             "timestamp": time.time(),
             "note": "⚠️ Résultats simulés - Configurez l'API Google pour des résultats réels"
         }
+
 
 class StackOverflowService:
     @staticmethod

@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recherche Intelligente</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,11 +17,108 @@
             box-sizing: border-box;
         }
 
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animations pour les nouveaux commentaires */
+        .comment-item {
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style pour la date relative */
+        .comment-date {
+            color: #666;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        /* Styles pour l'espace commentaire fixe à droite */
+        .comments-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
             padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .comments-sidebar.hidden {
+            transform: translateX(100%);
+        }
+
+        .toggle-comments-btn {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 10px;
+            border-radius: 10px 0 0 10px;
+            cursor: pointer;
+            z-index: 999;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-comments-btn:hover {
+            background: #5a6fd8;
+            padding-right: 15px;
+        }
+
+        .main-content {
+            margin-right: 400px;
+            transition: margin-right 0.3s ease;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-content.expanded {
+            margin-right: 0;
+        }
+
+        .btn-close-sidebar {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .btn-close-sidebar:hover {
+            color: #333;
         }
 
         .container {
@@ -26,11 +126,41 @@
             margin: 0 auto;
         }
 
+
+        /* Header avec compteur */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+
+        .visitor-counter {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+
+        .visitor-counter i {
+            color: #ffd700;
+        }
+
+
         /* Header et Logo */
         .header {
             text-align: center;
             margin-bottom: 40px;
         }
+
 
         .logo {
             width: 120px;
@@ -41,13 +171,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
+
 
         .logo i {
             font-size: 50px;
             color: #667eea;
         }
+
 
         .header h1 {
             color: white;
@@ -56,10 +188,12 @@
             margin-bottom: 10px;
         }
 
+
         .header p {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             font-size: 1.1rem;
         }
+
 
         /* Section Email */
         .email-section {
@@ -67,11 +201,13 @@
             margin: 0 auto 20px;
         }
 
+
         .email-input-container {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+
 
         .email-input {
             flex: 1;
@@ -81,8 +217,9 @@
             font-size: 1rem;
             outline: none;
             background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
+
 
         .email-label {
             color: white;
@@ -90,6 +227,7 @@
             margin-bottom: 8px;
             display: block;
         }
+
 
         .btn-show-history {
             background: rgba(255, 255, 255, 0.2);
@@ -102,16 +240,19 @@
             backdrop-filter: blur(10px);
         }
 
+
         .btn-show-history:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
+
 
         /* Section d'information */
         .info-section {
             max-width: 700px;
             margin: 0 auto 20px;
         }
+
 
         .info-message {
             background: rgba(255, 255, 255, 0.1);
@@ -126,10 +267,12 @@
             margin-bottom: 10px;
         }
 
+
         .info-message i {
             font-size: 1.2rem;
             color: #ffd700;
         }
+
 
         /* Champ de recherche */
         .search-container {
@@ -138,19 +281,22 @@
             position: relative;
         }
 
+
         .search-box {
             position: relative;
             background: white;
             border-radius: 50px;
             padding: 5px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
 
+
         .search-box:focus-within {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         }
+
 
         .search-input {
             width: 100%;
@@ -162,6 +308,7 @@
             background: transparent;
         }
 
+
         .search-icon {
             position: absolute;
             right: 20px;
@@ -170,6 +317,7 @@
             color: #667eea;
             font-size: 1.2rem;
         }
+
 
         .loading-spinner {
             position: absolute;
@@ -180,6 +328,7 @@
             display: none;
         }
 
+
         .search-results {
             position: absolute;
             top: 100%;
@@ -188,12 +337,13 @@
             background: white;
             border-radius: 15px;
             margin-top: 10px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             max-height: 400px;
             overflow-y: auto;
             display: none;
             z-index: 1000;
         }
+
 
         .result-item {
             padding: 15px 20px;
@@ -202,13 +352,16 @@
             transition: background 0.2s ease;
         }
 
+
         .result-item:hover {
             background: #f8f9fa;
         }
 
+
         .result-item:last-child {
             border-bottom: none;
         }
+
 
         .result-title {
             font-weight: 600;
@@ -216,17 +369,154 @@
             margin-bottom: 5px;
         }
 
+
         .result-source {
             font-size: 0.9rem;
             color: #667eea;
             font-weight: 500;
         }
 
+
+        /* Section Commentaires dans la sidebar */
+        .comments-header {
+            margin-bottom: 30px;
+            padding-right: 40px;
+        }
+
+
+        .comments-title {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+
+        .comment-form {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+
+        .btn-submit:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+
+        .comments-list {
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+
+        .comment-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+
+        .comment-author {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+
+        .comment-date {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+
+        .comment-message {
+            color: #555;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+
+        .no-comments {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-style: italic;
+        }
+
+
         /* Section Historique */
         .history-section {
             display: none;
             margin-top: 40px;
         }
+
 
         .history-item {
             background: rgba(255, 255, 255, 0.1);
@@ -239,25 +529,30 @@
             transition: all 0.3s ease;
         }
 
+
         .history-item:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateX(5px);
         }
+
 
         .history-question {
             font-weight: 600;
             margin-bottom: 5px;
         }
 
+
         .history-date {
             font-size: 0.8rem;
             opacity: 0.8;
         }
 
+
         /* Carousel */
         .carousel-section {
             margin-bottom: 40px;
         }
+
 
         .section-title {
             text-align: center;
@@ -266,6 +561,7 @@
             margin-bottom: 30px;
             font-weight: 600;
         }
+
 
         .carousel {
             display: flex;
@@ -276,25 +572,29 @@
             -ms-overflow-style: none;
         }
 
+
         .carousel::-webkit-scrollbar {
             display: none;
         }
 
+
         .carousel-item {
             min-width: 300px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             text-align: center;
             color: white;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: transform 0.3s ease;
         }
+
 
         .carousel-item:hover {
             transform: translateY(-5px);
         }
+
 
         .carousel-icon {
             font-size: 2.5rem;
@@ -302,11 +602,13 @@
             color: white;
         }
 
+
         .carousel-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 10px;
         }
+
 
         .carousel-description {
             font-size: 0.9rem;
@@ -314,10 +616,12 @@
             line-height: 1.5;
         }
 
+
         /* Résultats de recherche */
         .results-section {
             display: none;
         }
+
 
         .results-grid {
             display: grid;
@@ -326,24 +630,28 @@
             margin-top: 30px;
         }
 
+
         .result-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
             cursor: pointer;
         }
 
+
         .result-card:hover {
             transform: translateY(-5px);
         }
+
 
         .result-header {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
+
 
         .result-badge {
             padding: 5px 12px;
@@ -353,21 +661,25 @@
             margin-right: 10px;
         }
 
+
         .badge-google {
             background: #4285F4;
             color: white;
         }
+
 
         .badge-stackoverflow {
             background: #F48024;
             color: white;
         }
 
+
         .result-url {
             color: #666;
             font-size: 0.9rem;
             word-break: break-all;
         }
+
 
         .result-body h3 {
             color: #333;
@@ -376,15 +688,18 @@
             line-height: 1.4;
         }
 
+
         .result-body p {
             color: #666;
             line-height: 1.5;
             font-size: 0.95rem;
         }
 
+
         .result-tags {
             margin-top: 10px;
         }
+
 
         .tag {
             display: inline-block;
@@ -397,29 +712,56 @@
             margin-bottom: 5px;
         }
 
+
         /* Responsive */
         @media (max-width: 768px) {
+            .comments-sidebar {
+                width: 100%;
+                transform: translateX(100%);
+            }
+
+            .comments-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-right: 0;
+                padding: 15px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+
+
             .header h1 {
                 font-size: 2rem;
             }
-            
+
+
             .search-input {
                 padding: 15px 50px 15px 20px;
                 font-size: 1rem;
             }
-            
+
+
             .carousel-item {
                 min-width: 250px;
                 padding: 20px;
             }
-            
+
+
             .results-grid {
                 grid-template-columns: 1fr;
             }
 
+
             .email-input-container {
                 flex-direction: column;
             }
+
 
             .btn-show-history {
                 width: 100%;
@@ -427,115 +769,168 @@
         }
     </style>
 </head>
+
+
 <body>
-    <div class="container">
-        <!-- Header avec Logo -->
-        <div class="header">
-            <div class="logo">
-                <i class="fas fa-search"></i>
-            </div>
-            <h1>Recherche Intelligente</h1>
-            <p>Trouvez des réponses sur Google et StackOverflow instantanément</p>
-        </div>
+    <!-- Bouton pour afficher/masquer les commentaires -->
+    <button class="toggle-comments-btn" onclick="app.toggleCommentsSidebar()">
+        💬 Commentaires
+    </button>
 
-        <!-- Section Email -->
-        <div class="email-section">
-            <label class="email-label" for="userEmail">
-                <i class="fas fa-envelope"></i> Votre email (pour sauvegarder l'historique)
-            </label>
-            <div class="email-input-container">
-                <input 
-                    type="email" 
-                    class="email-input" 
-                    placeholder="votre@email.com" 
-                    id="userEmail"
-                >
-                <button class="btn-show-history" onclick="app.showHistory()">
-                    <i class="fas fa-history"></i> Historique
-                </button>
+    <!-- Contenu principal -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <!-- Header avec compteur -->
+            <div class="header-top">
+                <div class="visitor-counter">
+                    <i class="fas fa-users"></i>
+                    <span id="visitorCount">Chargement...</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Section d'information -->
-        <div class="info-section" id="infoSection" style="display: none;">
-            <div class="info-message">
-                <i class="fas fa-info-circle"></i>
-                <span id="infoText"></span>
-            </div>
-        </div>
 
-        <!-- Champ de recherche automatique -->
-        <div class="search-container">
-            <div class="search-box">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    placeholder="Posez votre question technique..." 
-                    id="searchInput"
-                >
-                <div class="search-icon">
+            <!-- Header avec Logo -->
+            <div class="header">
+                <div class="logo">
                     <i class="fas fa-search"></i>
                 </div>
-                <div class="loading-spinner" id="loadingSpinner">
-                    <i class="fas fa-spinner fa-spin"></i>
+                <h1>Recherche Intelligente</h1>
+                <p>Trouvez des réponses sur Google et StackOverflow instantanément</p>
+            </div>
+
+
+            <!-- Section Email -->
+            <div class="email-section">
+                <label class="email-label" for="userEmail">
+                    <i class="fas fa-envelope"></i> Votre email (pour sauvegarder l'historique)
+                </label>
+                <div class="email-input-container">
+                    <input type="email" class="email-input" placeholder="votre@email.com" id="userEmail">
+                    <button class="btn-show-history" onclick="app.showHistory()">
+                        <i class="fas fa-history"></i> Historique
+                    </button>
                 </div>
             </div>
-            <div class="search-results" id="searchResults"></div>
-        </div>
 
-        <!-- Section Historique -->
-        <div class="history-section" id="historySection">
-            <h2 class="section-title">Votre Historique de Recherches</h2>
-            <div id="historyList"></div>
-        </div>
 
-        <!-- Carousel d'informations -->
-        <div class="carousel-section">
-            <h2 class="section-title">Comment ça marche ?</h2>
-            <div class="carousel">
-                <div class="carousel-item">
-                    <div class="carousel-icon">
-                        <i class="fas fa-keyboard"></i>
-                    </div>
-                    <h3 class="carousel-title">Tapez votre question</h3>
-                    <p class="carousel-description">
-                        Posez n'importe quelle question technique ou problème de programmation
-                    </p>
-                </div>
-                <div class="carousel-item">
-                    <div class="carousel-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3 class="carousel-title">Recherche automatique</h3>
-                    <p class="carousel-description">
-                        Recherche simultanée sur Google et StackOverflow sans bouton
-                    </p>
-                </div>
-                <div class="carousel-item">
-                    <div class="carousel-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <h3 class="carousel-title">Résultats instantanés</h3>
-                    <p class="carousel-description">
-                        Obtenez des réponses pertinentes en temps réel
-                    </p>
-                </div>
-                <div class="carousel-item">
-                    <div class="carousel-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3 class="carousel-title">Historique sauvegardé</h3>
-                    <p class="carousel-description">
-                        Toutes vos recherches sont sauvegardées avec votre email
-                    </p>
+            <!-- Section d'information -->
+            <div class="info-section" id="infoSection" style="display: none;">
+                <div class="info-message">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="infoText"></span>
                 </div>
             </div>
+
+
+            <!-- Champ de recherche automatique -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Posez votre question technique..."
+                        id="searchInput">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+
+
+            <!-- Section Historique -->
+            <div class="history-section" id="historySection">
+                <h2 class="section-title">Votre Historique de Recherches</h2>
+                <div id="historyList"></div>
+            </div>
+
+
+            <!-- Carousel d'informations -->
+            <div class="carousel-section">
+                <h2 class="section-title">Comment ça marche ?</h2>
+                <div class="carousel">
+                    <div class="carousel-item">
+                        <div class="carousel-icon">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                        <h3 class="carousel-title">Tapez votre question</h3>
+                        <p class="carousel-description">
+                            Posez n'importe quelle question technique ou problème de programmation
+                        </p>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="carousel-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="carousel-title">Recherche automatique</h3>
+                        <p class="carousel-description">
+                            Recherche simultanée sur Google et StackOverflow sans bouton
+                        </p>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="carousel-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="carousel-title">Résultats instantanés</h3>
+                        <p class="carousel-description">
+                            Obtenez des réponses pertinentes en temps réel
+                        </p>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="carousel-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="carousel-title">Historique sauvegardé</h3>
+                        <p class="carousel-description">
+                            Toutes vos recherches sont sauvegardées avec votre email
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Section des résultats -->
+            <div class="results-section" id="resultsSection">
+                <h2 class="section-title">Résultats de votre recherche</h2>
+                <div class="results-grid" id="resultsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar des commentaires -->
+    <div class="comments-sidebar" id="commentsSidebar">
+        <button class="btn-close-sidebar" onclick="app.toggleCommentsSidebar()">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="comments-header">
+            <h2 class="comments-title">
+                <i class="fas fa-comments"></i> Commentaires
+            </h2>
         </div>
 
-        <!-- Section des résultats -->
-        <div class="results-section" id="resultsSection">
-            <h2 class="section-title">Résultats de votre recherche</h2>
-            <div class="results-grid" id="resultsGrid"></div>
+        <!-- Formulaire de commentaire -->
+        <div class="comment-form">
+            <div class="form-group">
+                <label class="form-label" for="commentUsername">Nom d'utilisateur *</label>
+                <input type="text" class="form-input" id="commentUsername" placeholder="Votre pseudo">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="commentMessage">Commentaire *</label>
+                <textarea class="form-textarea" id="commentMessage"
+                    placeholder="Partagez vos impressions... (minimum 10 caractères)"></textarea>
+            </div>
+            <button class="btn-submit" onclick="app.submitComment()">
+                <i class="fas fa-paper-plane"></i> Publier
+            </button>
+        </div>
+
+        <!-- Liste des commentaires en temps réel -->
+        <div class="comments-list" id="commentsList">
+            <div class="no-comments">
+                <i class="fas fa-comment-slash"></i>
+                <p>Chargement des commentaires...</p>
+            </div>
         </div>
     </div>
 
@@ -552,25 +947,36 @@
                 this.userEmail = document.getElementById('userEmail');
                 this.historySection = document.getElementById('historySection');
                 this.historyList = document.getElementById('historyList');
-                
+                this.visitorCount = document.getElementById('visitorCount');
+                this.commentsList = document.getElementById('commentsList');
+                this.commentsSidebar = document.getElementById('commentsSidebar');
+                this.mainContent = document.getElementById('mainContent');
+                this.commentUsername = document.getElementById('commentUsername');
+                this.commentMessage = document.getElementById('commentMessage');
+
                 this.debounceTimer = null;
                 this.currentSearch = '';
-                
+                this.csrfToken = '';
+                this.commentsUpdateInterval = null;
+
                 this.initEventListeners();
                 this.loadSavedEmail();
+                this.loadVisitorCount();
+                this.initRealTimeComments();
+                this.getCSRFToken();
             }
-            
+
             initEventListeners() {
                 // Recherche automatique avec debounce
                 this.searchInput.addEventListener('input', (e) => {
                     this.handleSearchInput(e.target.value);
                 });
-                
+
                 // Sauvegarder l'email quand il change
                 this.userEmail.addEventListener('change', () => {
                     this.saveEmail();
                 });
-                
+
                 // Fermer les résultats en cliquant ailleurs
                 document.addEventListener('click', (e) => {
                     if (!this.searchResults.contains(e.target) && e.target !== this.searchInput) {
@@ -578,79 +984,354 @@
                     }
                 });
             }
-            
+
+            // Méthode pour basculer la sidebar des commentaires
+            toggleCommentsSidebar() {
+                this.commentsSidebar.classList.toggle('hidden');
+                this.mainContent.classList.toggle('expanded');
+            }
+
+            // Initialiser les commentaires en temps réel
+            initRealTimeComments() {
+                this.loadComments();
+                // Mettre à jour les commentaires toutes les 5 secondes
+                this.commentsUpdateInterval = setInterval(() => {
+                    this.loadComments();
+                }, 5000);
+            }
+
+            async getCSRFToken() {
+                try {
+                    const response = await fetch('/api/csrf-token/');
+                    const data = await response.json();
+                    this.csrfToken = data.csrfToken;
+                } catch (error) {
+                    console.error('Erreur chargement token CSRF:', error);
+                }
+            }
+
+            async loadVisitorCount() {
+                try {
+                    const response = await fetch('/api/compteur/');
+                    const data = await response.json();
+                    this.visitorCount.textContent = `${data.nombre_visites} visiteurs`;
+                } catch (error) {
+                    console.error('Erreur chargement compteur:', error);
+                    this.visitorCount.textContent = 'Erreur de chargement';
+                }
+            }
+
+            async loadComments() {
+                try {
+                    const response = await fetch('/api/commentaires/');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const comments = await response.json();
+
+                    // Vérifier que comments est bien un tableau
+                    if (!Array.isArray(comments)) {
+                        console.error('Les commentaires ne sont pas un tableau:', comments);
+                        this.displayComments([]);
+                        return;
+                    }
+
+                    this.displayComments(comments);
+                } catch (error) {
+                    console.error('Erreur chargement commentaires:', error);
+                    this.displayComments([]);
+                }
+            }
+
+            displayComments(comments) {
+                // S'assurer que comments est un tableau
+                if (!Array.isArray(comments)) {
+                    console.error('displayComments: comments n\'est pas un tableau', comments);
+                    comments = [];
+                }
+
+                if (comments.length === 0) {
+                    this.commentsList.innerHTML = `
+                <div class="no-comments">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>Aucun commentaire pour le moment. Soyez le premier à commenter !</p>
+                </div>
+            `;
+                    return;
+                }
+
+                // Trier les commentaires par date décroissante (les plus récents en premier)
+                const sortedComments = comments.sort((a, b) => {
+                    const dateA = new Date(a.date_creation);
+                    const dateB = new Date(b.date_creation);
+                    return dateB - dateA; // Tri décroissant
+                });
+
+                this.commentsList.innerHTML = sortedComments.map(comment => `
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author">${this.escapeHtml(comment.username)}</div>
+                    <div class="comment-date">${this.formatDateTime(comment.date_creation)}</div>
+                </div>
+                <div class="comment-message">${this.escapeHtml(comment.message)}</div>
+            </div>
+        `).join('');
+            }
+
+            async submitComment() {
+                const username = this.commentUsername.value.trim();
+                const message = this.commentMessage.value.trim();
+
+                if (!username) {
+                    alert('Veuillez entrer votre nom d\'utilisateur');
+                    this.commentUsername.focus();
+                    return;
+                }
+
+                if (!message) {
+                    alert('Veuillez entrer votre commentaire');
+                    this.commentMessage.focus();
+                    return;
+                }
+
+                if (message.length < 10) {
+                    alert('Le commentaire doit contenir au moins 10 caractères');
+                    this.commentMessage.focus();
+                    return;
+                }
+
+                try {
+                    const headers = {
+                        'Content-Type': 'application/json',
+                    };
+
+                    if (this.csrfToken) {
+                        headers['X-CSRFToken'] = this.csrfToken;
+                    }
+
+                    const response = await fetch('/api/commentaires/', {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({
+                            username: username,
+                            message: message
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+
+                        // AFFICHER IMMÉDIATEMENT LE NOUVEAU COMMENTAIRE
+                        this.addCommentImmediately(result.commentaire);
+
+                        // Réinitialiser le formulaire (garder le username)
+                        this.commentMessage.value = '';
+
+                        // Afficher un message de succès
+                        this.showCommentSuccess('Votre commentaire a été publié avec succès!');
+
+                    } else {
+                        const errorData = await response.json();
+                        console.error('Erreur détaillée:', errorData);
+                        alert('Erreur lors de l\'envoi du commentaire: ' + (errorData.detail || JSON.stringify(errorData)));
+                    }
+                } catch (error) {
+                    console.error('Erreur envoi commentaire:', error);
+                    alert('Erreur lors de l\'envoi du commentaire: ' + error.message);
+                }
+            }
+
+            // Nouvelle méthode pour ajouter immédiatement le commentaire
+            addCommentImmediately(comment) {
+                // Vérifier que comment est défini
+                if (!comment) {
+                    console.error('Commentaire non défini dans addCommentImmediately');
+                    return;
+                }
+
+                // Créer l'élément du nouveau commentaire
+                const commentElement = document.createElement('div');
+                commentElement.className = 'comment-item';
+                commentElement.innerHTML = `
+            <div class="comment-header">
+                <div class="comment-author">${this.escapeHtml(comment.username)}</div>
+                <div class="comment-date">${this.formatDateTime(comment.date_creation)}</div>
+            </div>
+            <div class="comment-message">${this.escapeHtml(comment.message)}</div>
+        `;
+
+                // Vérifier si commentsList existe
+                if (!this.commentsList) {
+                    console.error('commentsList non trouvé');
+                    return;
+                }
+
+                // Vérifier s'il y a des commentaires existants
+                const existingComments = this.commentsList.querySelectorAll('.comment-item');
+                const noCommentsMessage = this.commentsList.querySelector('.no-comments');
+
+                // Supprimer le message "aucun commentaire" s'il existe
+                if (noCommentsMessage) {
+                    noCommentsMessage.remove();
+                }
+
+                // Ajouter le nouveau commentaire au début de la liste
+                if (existingComments.length > 0) {
+                    this.commentsList.insertBefore(commentElement, existingComments[0]);
+                } else {
+                    this.commentsList.appendChild(commentElement);
+                }
+
+                // Ajouter une animation d'apparition
+                commentElement.style.opacity = '0';
+                commentElement.style.transform = 'translateY(-20px)';
+
+                // Animation
+                setTimeout(() => {
+                    commentElement.style.transition = 'all 0.3s ease';
+                    commentElement.style.opacity = '1';
+                    commentElement.style.transform = 'translateY(0)';
+                }, 10);
+
+                // Faire défiler vers le nouveau commentaire
+                setTimeout(() => {
+                    commentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+
+            showCommentSuccess(message) {
+                // Créer une notification temporaire
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 3000);
+            }
+
+            // Formater la date et l'heure
+            formatDateTime(dateString) {
+                try {
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMs / 3600000);
+
+                    // Si moins d'une minute
+                    if (diffMins < 1) {
+                        return 'À l\'instant';
+                    }
+                    // Si moins d'une heure
+                    else if (diffMins < 60) {
+                        return `Il y a ${diffMins} min`;
+                    }
+                    // Si moins de 24 heures
+                    else if (diffHours < 24) {
+                        return `Il y a ${diffHours} h`;
+                    }
+                    // Sinon afficher la date complète
+                    else {
+                        return date.toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Erreur formatage date:', error);
+                    return 'Date inconnue';
+                }
+            }
+
             saveEmail() {
                 const email = this.userEmail.value;
                 if (email) {
                     localStorage.setItem('userEmail', email);
                 }
             }
-            
+
             loadSavedEmail() {
                 const savedEmail = localStorage.getItem('userEmail');
                 if (savedEmail) {
                     this.userEmail.value = savedEmail;
                 }
             }
-            
+
             handleSearchInput(query) {
                 clearTimeout(this.debounceTimer);
-                
+
                 if (query.length < 3) {
                     this.hideResults();
                     this.hideLoading();
                     this.hideInfo();
                     return;
                 }
-                
+
                 this.currentSearch = query;
                 this.showLoading();
-                
+
                 this.debounceTimer = setTimeout(() => {
                     this.performSearch(query);
                 }, 500);
             }
-            
+
             async performSearch(query) {
                 try {
                     const email = this.userEmail.value || 'anonymous@example.com';
-                    
+
                     // Utiliser l'endpoint qui sauvegarde automatiquement
                     const response = await fetch(`/api/recherches/rechercher_solutions/?q=${encodeURIComponent(query)}&email=${encodeURIComponent(email)}`);
                     const data = await response.json();
-                    
+
                     this.hideLoading();
                     this.displaySearchResults(data);
-                    
+
                 } catch (error) {
                     console.error('Erreur de recherche:', error);
                     this.hideLoading();
                     this.showError('Erreur lors de la recherche');
                 }
             }
-            
+
             async showHistory() {
                 const email = this.userEmail.value;
                 if (!email) {
                     alert('Veuillez entrer votre email pour voir l\'historique');
                     return;
                 }
-                
+
                 try {
                     const response = await fetch(`/api/recherches/historique_utilisateur/?email=${encodeURIComponent(email)}`);
                     const data = await response.json();
-                    
+
                     this.displayHistory(data);
-                    
+
                 } catch (error) {
                     console.error('Erreur chargement historique:', error);
                     alert('Erreur lors du chargement de l\'historique');
                 }
             }
-            
+
             displayHistory(data) {
                 this.historyList.innerHTML = '';
-                
+
                 if (data.historique.length === 0) {
                     this.historyList.innerHTML = '<div class="history-item">Aucune recherche sauvegardée</div>';
                 } else {
@@ -658,93 +1339,93 @@
                         const historyItem = document.createElement('div');
                         historyItem.className = 'history-item';
                         historyItem.innerHTML = `
-                            <div class="history-question">${recherche.question_recherche}</div>
-                            <div class="history-date">${new Date(recherche.date_creation).toLocaleString('fr-FR')}</div>
-                        `;
-                        
+                    <div class="history-question">${recherche.question_recherche}</div>
+                    <div class="history-date">${new Date(recherche.date_creation).toLocaleString('fr-FR')}</div>
+                `;
+
                         historyItem.addEventListener('click', () => {
                             this.searchInput.value = recherche.question_recherche;
                             this.handleSearchInput(recherche.question_recherche);
                             this.hideHistory();
                         });
-                        
+
                         this.historyList.appendChild(historyItem);
                     });
                 }
-                
+
                 this.historySection.style.display = 'block';
                 this.historySection.scrollIntoView({ behavior: 'smooth' });
             }
-            
+
             hideHistory() {
                 this.historySection.style.display = 'none';
             }
-            
+
             displaySearchResults(data) {
                 if (!data.sources) {
                     this.showError('Aucun résultat trouvé');
                     return;
                 }
-                
+
                 const allResults = [
                     ...(data.sources.google?.resultats || []),
                     ...(data.sources.stackoverflow?.resultats || [])
                 ];
-                
+
                 if (allResults.length === 0) {
                     this.showError('Aucun résultat trouvé');
                     return;
                 }
-                
+
                 // Afficher les résultats dans le dropdown
                 this.searchResults.innerHTML = allResults.slice(0, 5).map(result => `
-                    <div class="result-item" onclick="app.selectResult('${result.titre.replace(/'/g, "\\'")}')">
-                        <div class="result-title">${this.truncateText(result.titre, 60)}</div>
-                        <div class="result-source">${result.source}</div>
-                    </div>
-                `).join('');
-                
+            <div class="result-item" onclick="app.selectResult('${result.titre.replace(/'/g, "\\'")}')">
+                <div class="result-title">${this.truncateText(result.titre, 60)}</div>
+                <div class="result-source">${result.source}</div>
+            </div>
+        `).join('');
+
                 this.showResults();
-                
+
                 // Afficher les résultats complets
                 this.displayFullResults(data);
             }
-            
+
             displayFullResults(data) {
                 this.resultsGrid.innerHTML = '';
-                
+
                 // Afficher les messages d'information
                 this.displayInfoMessages(data);
-                
+
                 // Afficher résultats Google
                 if (data.sources.google?.resultats?.length > 0) {
                     data.sources.google.resultats.forEach(result => {
                         this.addResultCard(result, 'google');
                     });
                 }
-                
+
                 // Afficher résultats StackOverflow
                 if (data.sources.stackoverflow?.resultats?.length > 0) {
                     data.sources.stackoverflow.resultats.forEach(result => {
                         this.addResultCard(result, 'stackoverflow');
                     });
                 }
-                
+
                 this.resultsSection.style.display = 'block';
                 this.scrollToResults();
             }
-            
+
             displayInfoMessages(data) {
                 let messages = [];
-                
+
                 if (data.sources.google?.note) {
                     messages.push(data.sources.google.note);
                 }
-                
+
                 if (data.sources.stackoverflow?.note) {
                     messages.push(data.sources.stackoverflow.note);
                 }
-                
+
                 if (messages.length > 0) {
                     this.infoText.textContent = messages.join(' | ');
                     this.infoSection.style.display = 'block';
@@ -752,80 +1433,80 @@
                     this.infoSection.style.display = 'none';
                 }
             }
-            
+
             addResultCard(result, source) {
                 const card = document.createElement('div');
                 card.className = 'result-card';
-                
+
                 // Construire les tags si disponibles
                 const tagsHtml = result.tags ? `
-                    <div class="result-tags">
-                        ${result.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                    </div>
-                ` : '';
-                
+            <div class="result-tags">
+                ${result.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+        ` : '';
+
                 card.innerHTML = `
-                    <div class="result-header">
-                        <span class="result-badge ${source === 'google' ? 'badge-google' : 'badge-stackoverflow'}">
-                            ${source === 'google' ? 'Google' : 'StackOverflow'}
-                        </span>
-                        <span class="result-url">${this.truncateUrl(result.url)}</span>
-                    </div>
-                    <div class="result-body">
-                        <h3>${result.titre}</h3>
-                        <p>${result.description || 'Aucune description disponible'}</p>
-                        ${tagsHtml}
-                    </div>
-                `;
-                
+            <div class="result-header">
+                <span class="result-badge ${source === 'google' ? 'badge-google' : 'badge-stackoverflow'}">
+                    ${source === 'google' ? 'Google' : 'StackOverflow'}
+                </span>
+                <span class="result-url">${this.truncateUrl(result.url)}</span>
+            </div>
+            <div class="result-body">
+                <h3>${result.titre}</h3>
+                <p>${result.description || 'Aucune description disponible'}</p>
+                ${tagsHtml}
+            </div>
+        `;
+
                 card.addEventListener('click', () => {
                     window.open(result.url, '_blank');
                 });
-                
+
                 this.resultsGrid.appendChild(card);
             }
-            
+
             selectResult(title) {
                 this.searchInput.value = title;
                 this.hideResults();
                 this.handleSearchInput(title);
             }
-            
+
             showLoading() {
                 this.loadingSpinner.style.display = 'block';
                 document.querySelector('.search-icon').style.display = 'none';
             }
-            
+
             hideLoading() {
                 this.loadingSpinner.style.display = 'none';
                 document.querySelector('.search-icon').style.display = 'block';
             }
-            
+
             showResults() {
                 this.searchResults.style.display = 'block';
             }
-            
+
             hideResults() {
                 this.searchResults.style.display = 'none';
             }
-            
+
             hideInfo() {
                 this.infoSection.style.display = 'none';
             }
-            
+
             showError(message) {
                 this.searchResults.innerHTML = `<div class="result-item">${message}</div>`;
                 this.showResults();
             }
-            
+
             scrollToResults() {
                 this.resultsSection.scrollIntoView({ behavior: 'smooth' });
             }
-            
+
             truncateText(text, length) {
                 return text.length > length ? text.substring(0, length) + '...' : text;
             }
-            
+
             truncateUrl(url) {
                 try {
                     const urlObj = new URL(url);
@@ -834,15 +1515,33 @@
                     return this.truncateText(url, 50);
                 }
             }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Nettoyer l'intervalle quand la page se ferme
+            destroy() {
+                if (this.commentsUpdateInterval) {
+                    clearInterval(this.commentsUpdateInterval);
+                }
+            }
         }
-        
+
         // Initialiser l'application
         const app = new SearchApp();
-        
+
+        // Nettoyage quand la page se ferme
+        window.addEventListener('beforeunload', () => {
+            app.destroy();
+        });
+
         // Animation du carousel
         let scrollPosition = 0;
         const carousel = document.querySelector('.carousel');
-        
+
         function autoScrollCarousel() {
             if (carousel) {
                 scrollPosition += 1;
@@ -852,8 +1551,10 @@
                 carousel.scrollTo({ left: scrollPosition, behavior: 'smooth' });
             }
         }
-        
+
         setInterval(autoScrollCarousel, 50);
     </script>
 </body>
+
+
 </html>
