@@ -30,7 +30,9 @@ SECRET_KEY = 'django-insecure-4rw2#3#x!df)k2#*knexfw%u1_k4l-9+4$%4w8hpl&mba1s==!
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
 
-DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+DEBUG = False
+
+#DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
     'scrapting-search.onrender.com',
